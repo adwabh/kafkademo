@@ -1,0 +1,16 @@
+spring:
+  application:
+    name: kafka-demo
+    cloud:
+      stream:
+        kafka:
+          binder:
+            brokers: localhost:9092
+        bindings:
+          customer-out-0:
+            destination: customer_out_topic
+            contentType: application/json
+            producer:
+              useNativeEncoding: true
+server:
+  port: 8084
