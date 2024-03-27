@@ -12,5 +12,12 @@ spring:
             contentType: application/json
             producer:
               useNativeEncoding: true
+logging:
+  level:
+    org:
+      springframework:
+        web: DEBUG
+        reactive: DEBUG
+        kafka: DEBUG
 server:
   port: 8084
