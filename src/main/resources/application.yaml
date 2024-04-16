@@ -1,17 +1,23 @@
+#spring.cloud.stream.function.bindings.uppercase-in-0=input
 spring:
   application:
     name: kafka-demo
-    cloud:
-      stream:
-        kafka:
-          binder:
-            brokers: localhost:9092
-        bindings:
-          customer-out-0:
-            destination: customer_out_topic
-            contentType: application/json
-            producer:
-              useNativeEncoding: true
+  cloud:
+    function:
+      definition: customerKafkaProducer;incomingCustomer;
+    stream:
+      defaultBinder: reactorKafka # or reactorKafka
+      kafka:
+        binder:
+          brokers: localhost:9092
+          autoCreateTopics: true
+      bindings:
+        incomingCustomer-in-0:
+          destination: customer_out_topic
+          contentType: application/json
+        customerKafkaProducer-out-0:
+          destination: customer_out_topic
+          contentType: application/json
 logging:
   level:
     org:

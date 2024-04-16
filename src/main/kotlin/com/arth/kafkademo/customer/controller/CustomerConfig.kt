@@ -5,6 +5,7 @@ import com.arth.kafkademo.customer.service.CustomerService
 import kafka.e2e.customer.service.CustomerServiceImpl
 import kotlinx.coroutines.flow.firstOrNull
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.web.reactive.function.server.*
@@ -14,7 +15,7 @@ import java.util.function.Function
 open class CustomerConfig {
 
     @Bean
-    fun customerService(customerKafkaProducer: Function<Customer, String>): CustomerService {
+    fun customerService(@Qualifier("customerKafkaProducer") customerKafkaProducer: Function<Customer, Unit>): CustomerService {
         return CustomerServiceImpl(customerKafkaProducer)
     }
 
@@ -25,14 +26,18 @@ open class CustomerConfig {
         }
     }
 
-    private fun CoRouterFunctionDsl.pushCustomerRecord(customerService: CustomerService) = POST("/customer") { serverRequest ->
-        serverResponse(serverRequest, customerService)
-    }
+    private fun CoRouterFunctionDsl.pushCustomerRecord(customerService: CustomerService) =
+        POST("/customer") { serverRequest ->
+            serverResponse(serverRequest, customerService)
+        }
 
-    private suspend fun serverResponse(serverRequest: ServerRequest, customerService: CustomerService):ServerResponse =
-            serverRequest.bodyToFlow<Customer>()
-                    .firstOrNull()?.let {
-                        customerService.save(it)
-                        ServerResponse.ok().bodyValueAndAwait("Customer saved")
-                    } ?: ServerResponse.badRequest().bodyValueAndAwait("Invalid customer")
+    private suspend fun serverResponse(
+        serverRequest: ServerRequest,
+        customerService: CustomerService
+    ): ServerResponse =
+        serverRequest.bodyToFlow<Customer>()
+            .firstOrNull()?.let {
+                customerService.save(it)
+                ServerResponse.ok().bodyValueAndAwait("Customer saved")
+            } ?: ServerResponse.badRequest().bodyValueAndAwait("Invalid customer")
 }

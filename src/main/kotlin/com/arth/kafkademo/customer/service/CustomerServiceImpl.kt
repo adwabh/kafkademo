@@ -7,7 +7,8 @@ import org.springframework.stereotype.Service
 import java.util.function.Function
 
 @Service
-class CustomerServiceImpl(@Autowired private val customerKafkaProducer: Function<Customer, String>) : CustomerService {
+class CustomerServiceImpl(@Autowired private val customerKafkaProducer: Function<Customer, Unit>) :
+    CustomerService {
 
     override fun save(customer: Customer) {
         customerKafkaProducer.apply(customer)
